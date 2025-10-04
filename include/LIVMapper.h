@@ -49,6 +49,7 @@ public:
   void livox_pcl_cbk(const livox_ros_driver::CustomMsg::ConstPtr &msg_in);
   void imu_cbk(const sensor_msgs::Imu::ConstPtr &msg_in);
   void img_cbk(const sensor_msgs::ImageConstPtr &msg_in);
+  void odom_cbk(const nav_msgs::Odometry::ConstPtr &msg_in);
   void publish_img_rgb(const image_transport::Publisher &pubImage, VIOManagerPtr vio_manager);
   void publish_frame_world(const ros::Publisher &pubLaserCloudFullRes, VIOManagerPtr vio_manager);
   void publish_visual_sub_map(const ros::Publisher &pubSubVisualMap);
@@ -69,7 +70,7 @@ public:
   std::unordered_map<VOXEL_LOCATION, VoxelOctoTree *> voxel_map;
   
   string root_dir;
-  string lid_topic, imu_topic, seq_name, img_topic;
+  string lid_topic, imu_topic, seq_name, img_topic, odom_topic;
   V3D extT;
   M3D extR;
 
@@ -151,6 +152,7 @@ public:
 
   nav_msgs::Path path;
   nav_msgs::Odometry odomAftMapped;
+  // nav_msgs::Odometry odomBufferMesh;
   geometry_msgs::Quaternion geoQuat;
   geometry_msgs::PoseStamped msg_body_pose;
 
@@ -164,6 +166,7 @@ public:
   ros::Subscriber sub_pcl;
   ros::Subscriber sub_imu;
   ros::Subscriber sub_img;
+  ros::Subscriber sub_odom;
   ros::Publisher pubLaserCloudFullRes;
   ros::Publisher pubNormal;
   ros::Publisher pubSubVisualMap;

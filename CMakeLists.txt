@@ -94,7 +94,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 find_package(Eigen3 REQUIRED)
-find_package(PCL REQUIRED)
+find_package(PCL 1.10 REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(Sophus REQUIRED)
 find_package(Boost REQUIRED COMPONENTS thread)
@@ -145,3 +145,8 @@ target_link_libraries(fastlivo_mapping
 if(mimalloc_FOUND)
   target_link_libraries(fastlivo_mapping mimalloc)
 endif()
+
+catkin_install_python(PROGRAMS
+  scripts/mag_field_visualizer.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
