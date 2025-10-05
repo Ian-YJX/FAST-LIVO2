@@ -152,7 +152,6 @@ public:
 
   nav_msgs::Path path;
   nav_msgs::Odometry odomAftMapped;
-  // nav_msgs::Odometry odomBufferMesh;
   geometry_msgs::Quaternion geoQuat;
   geometry_msgs::PoseStamped msg_body_pose;
 
