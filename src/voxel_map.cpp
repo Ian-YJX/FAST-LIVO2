@@ -342,10 +342,6 @@ void VoxelMapManager::StateEstimation(StatesGroup &state_propagat)
   body_cov_list_.clear();
   body_cov_list_.reserve(feats_down_size_);
 
-  // build_residual_time = 0.0;
-  // ekf_time = 0.0;
-  // double t0 = omp_get_wtime();
-
   for (size_t i = 0; i < feats_down_body_->size(); i++)
   {
     V3D point_this(feats_down_body_->points[i].x, feats_down_body_->points[i].y, feats_down_body_->points[i].z);
@@ -390,12 +386,7 @@ void VoxelMapManager::StateEstimation(StatesGroup &state_propagat)
     }
     ptpl_list_.clear();
 
-    // double t1 = omp_get_wtime();
-
     BuildResidualListOMP(pv_list_, ptpl_list_);
-
-    // build_residual_time += omp_get_wtime() - t1;
-
     for (int i = 0; i < ptpl_list_.size(); i++)
     {
       total_residual += fabs(ptpl_list_[i].dis_to_plane_);
@@ -419,27 +410,12 @@ void VoxelMapManager::StateEstimation(StatesGroup &state_propagat)
       V3D point_body(ptpl.point_b_);
       M3D point_crossmat;
       point_crossmat << SKEW_SYM_MATRX(point_this);
-
-      /*** get the normal vector of closest surface/corner ***/
-
       V3D point_world = state_propagat.rot_end * point_this + state_propagat.pos_end;
       Eigen::Matrix<double, 1, 6> J_nq;
       J_nq.block<1, 3>(0, 0) = point_world - ptpl_list_[i].center_;
       J_nq.block<1, 3>(0, 3) = -ptpl_list_[i].normal_;
 
       M3D var;
-      // V3D normal_b = state_.rot_end.inverse() * ptpl_list_[i].normal_;
-      // V3D point_b = ptpl_list_[i].point_b_;
-      // double cos_theta = fabs(normal_b.dot(point_b) / point_b.norm());
-      // ptpl_list_[i].body_cov_ = ptpl_list_[i].body_cov_ * (1.0 / cos_theta) * (1.0 / cos_theta);
-
-      // point_w cov
-      // var = state_propagat.rot_end * extR_ * ptpl_list_[i].body_cov_ * (state_propagat.rot_end * extR_).transpose() +
-      //       state_propagat.cov.block<3, 3>(3, 3) + (-point_crossmat) * state_propagat.cov.block<3, 3>(0, 0) * (-point_crossmat).transpose();
-
-      // point_w cov (another_version)
-      // var = state_propagat.rot_end * extR_ * ptpl_list_[i].body_cov_ * (state_propagat.rot_end * extR_).transpose() +
-      //       state_propagat.cov.block<3, 3>(3, 3) - point_crossmat * state_propagat.cov.block<3, 3>(0, 0) * point_crossmat;
 
       // point_body cov
       var = state_propagat.rot_end * extR_ * ptpl_list_[i].body_cov_ * (state_propagat.rot_end * extR_).transpose();
@@ -447,7 +423,6 @@ void VoxelMapManager::StateEstimation(StatesGroup &state_propagat)
       double sigma_l = J_nq * ptpl_list_[i].plane_var_ * J_nq.transpose();
 
       R_inv(i) = 1.0 / (0.001 + sigma_l + ptpl_list_[i].normal_.transpose() * var * ptpl_list_[i].normal_);
-      // R_inv(i) = 1.0 / (sigma_l + ptpl_list_[i].normal_.transpose() * var * ptpl_list_[i].normal_);
 
       /*** calculate the Measuremnt Jacobian matrix H ***/
       V3D A(point_crossmat * state_.rot_end.transpose() * ptpl_list_[i].normal_);
@@ -492,22 +467,10 @@ void VoxelMapManager::StateEstimation(StatesGroup &state_propagat)
       position_last_ = state_.pos_end;
       geoQuat_ = tf::createQuaternionMsgFromRollPitchYaw(euler_cur(0), euler_cur(1), euler_cur(2));
 
-      // VD(DIM_STATE) K_sum  = K.rowwise().sum();
-      // VD(DIM_STATE) P_diag = _state.cov.diagonal();
       EKF_stop_flg = true;
     }
     if (EKF_stop_flg) break;
   }
-
-  // double t2 = omp_get_wtime();
-  // scan_count++;
-  // ekf_time = t2 - t0 - build_residual_time;
-
-  // ave_build_residual_time = ave_build_residual_time * (scan_count - 1) / scan_count + build_residual_time / scan_count;
-  // ave_ekf_time = ave_ekf_time * (scan_count - 1) / scan_count + ekf_time / scan_count;
-
-  // cout << "[ Mapping ] ekf_time: " << ekf_time << "s, build_residual_time: " << build_residual_time << "s" << endl;
-  // cout << "[ Mapping ] ave_ekf_time: " << ave_ekf_time << "s, ave_build_residual_time: " << ave_build_residual_time << "s" << endl;
 }
 
 void VoxelMapManager::TransformLidar(const Eigen::Matrix3d rot, const Eigen::Vector3d t, const PointCloudXYZI::Ptr &input_cloud,

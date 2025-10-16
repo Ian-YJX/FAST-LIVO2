@@ -907,22 +907,22 @@ void LIVMapper::odom_cbk(const nav_msgs::Odometry::ConstPtr &msg)
   odomAftMapped.twist = msg->twist;
   // set_posestamp(odomAftMapped.pose.pose);
 
-  static tf::TransformBroadcaster br;
-  tf::Transform transform;
+  // static tf::TransformBroadcaster br;
+  // tf::Transform transform;
 
-  // 正确的 origin 设置
-  transform.setOrigin(tf::Vector3(
-      msg->pose.pose.position.x,
-      msg->pose.pose.position.y,
-      msg->pose.pose.position.z));
+  // // 正确的 origin 设置
+  // transform.setOrigin(tf::Vector3(
+  //     msg->pose.pose.position.x,
+  //     msg->pose.pose.position.y,
+  //     msg->pose.pose.position.z));
 
-  // 正确的 rotation 设置
-  tf::Quaternion q(
-      msg->pose.pose.orientation.x,
-      msg->pose.pose.orientation.y,
-      msg->pose.pose.orientation.z,
-      msg->pose.pose.orientation.w);
-  transform.setRotation(q);
+  // // 正确的 rotation 设置
+  // tf::Quaternion q(
+  //     msg->pose.pose.orientation.x,
+  //     msg->pose.pose.orientation.y,
+  //     msg->pose.pose.orientation.z,
+  //     msg->pose.pose.orientation.w);
+  // transform.setRotation(q);
 
   // br.sendTransform(tf::StampedTransform(
   //     transform, odomAftMapped.header.stamp,
