@@ -55,6 +55,7 @@ void LIVMapper::readParameters(ros::NodeHandle &nh)
   nh.param<int>("common/img_en", img_en, 1);
   nh.param<int>("common/lidar_en", lidar_en, 1);
   nh.param<string>("common/img_topic", img_topic, "/left_camera/image");
+  nh.param<bool>("common/use_external_odom", use_external_odom, false);
   nh.param<string>("common/odometry_topic", odom_topic, "/aft_mapped_to_init_mesh");
   nh.param<bool>("vio/normal_en", normal_en, true);
   nh.param<bool>("vio/inverse_composition_en", inverse_composition_en, false);
@@ -199,7 +200,8 @@ void LIVMapper::initializeSubscribersAndPublishers(ros::NodeHandle &nh, image_tr
   sub_pcl = p_pre->lidar_type == AVIA ? nh.subscribe(lid_topic, 200000, &LIVMapper::livox_pcl_cbk, this) : nh.subscribe(lid_topic, 200000, &LIVMapper::standard_pcl_cbk, this);
   sub_imu = nh.subscribe(imu_topic, 200000, &LIVMapper::imu_cbk, this);
   sub_img = nh.subscribe(img_topic, 200000, &LIVMapper::img_cbk, this);
-  sub_odom = nh.subscribe(odom_topic, 10, &LIVMapper::odom_cbk, this);
+  if (use_external_odom)
+    sub_odom = nh.subscribe(odom_topic, 10, &LIVMapper::odom_cbk, this);
 
   pubLaserCloudFullRes = nh.advertise<sensor_msgs::PointCloud2>("/cloud_registered", 100);
   pubNormal = nh.advertise<visualization_msgs::MarkerArray>("visualization_marker", 100);
@@ -905,28 +907,6 @@ void LIVMapper::odom_cbk(const nav_msgs::Odometry::ConstPtr &msg)
   odomAftMapped.header.stamp = msg->header.stamp;
   odomAftMapped.pose = msg->pose;
   odomAftMapped.twist = msg->twist;
-  // set_posestamp(odomAftMapped.pose.pose);
-
-  // static tf::TransformBroadcaster br;
-  // tf::Transform transform;
-
-  // // 正确的 origin 设置
-  // transform.setOrigin(tf::Vector3(
-  //     msg->pose.pose.position.x,
-  //     msg->pose.pose.position.y,
-  //     msg->pose.pose.position.z));
-
-  // // 正确的 rotation 设置
-  // tf::Quaternion q(
-  //     msg->pose.pose.orientation.x,
-  //     msg->pose.pose.orientation.y,
-  //     msg->pose.pose.orientation.z,
-  //     msg->pose.pose.orientation.w);
-  // transform.setRotation(q);
-
-  // br.sendTransform(tf::StampedTransform(
-  //     transform, odomAftMapped.header.stamp,
-  //     "camera_init", "aft_mapped"));
 }
 
 bool LIVMapper::sync_packages(LidarMeasureGroup &meas)
@@ -1182,7 +1162,7 @@ void LIVMapper::publish_img_rgb(const image_transport::Publisher &pubImage, VIOM
   cv::Mat img_rgb = vio_manager->img_cp;
   cv_bridge::CvImage out_msg;
   out_msg.header.stamp = ros::Time::now();
-  // out_msg.header.frame_id = "camera_init";
+  out_msg.header.frame_id = "camera_init";
   out_msg.encoding = sensor_msgs::image_encodings::BGR8;
   out_msg.image = img_rgb;
   pubImage.publish(out_msg.toImageMsg());
@@ -1343,19 +1323,39 @@ void LIVMapper::publish_effect_world(const ros::Publisher &pubLaserCloudEffect, 
 template <typename T>
 void LIVMapper::set_posestamp(T &out)
 {
-  // out.position.x = _state.pos_end(0);
-  // out.position.y = _state.pos_end(1);
-  // out.position.z = _state.pos_end(2);
-  // out.orientation.x = geoQuat.x;
-  // out.orientation.y = geoQuat.y;
-  // out.orientation.z = geoQuat.z;
-  // out.orientation.w = geoQuat.w;
-  out = odomAftMapped.pose.pose;
-  // out.orientation = odomAftMapped.pose.pose.orientation;
+  if (use_external_odom)
+    out = odomAftMapped.pose.pose;
+  else
+  {
+    out.position.x = _state.pos_end(0);
+    out.position.y = _state.pos_end(1);
+    out.position.z = _state.pos_end(2);
+    out.orientation.x = geoQuat.x;
+    out.orientation.y = geoQuat.y;
+    out.orientation.z = geoQuat.z;
+    out.orientation.w = geoQuat.w;
+  }
 }
 
 void LIVMapper::publish_odometry(const ros::Publisher &pubOdomAftMapped)
 {
+  if (!use_external_odom)
+  {
+    odomAftMapped.header.stamp = ros::Time::now(); //.fromSec(last_timestamp_lidar);
+    odomAftMapped.header.frame_id = "camera_init";
+    odomAftMapped.child_frame_id = "aft_mapped";
+    set_posestamp(odomAftMapped.pose.pose);
+    static tf::TransformBroadcaster br;
+    tf::Transform transform;
+    tf::Quaternion q;
+    transform.setOrigin(tf::Vector3(_state.pos_end(0), _state.pos_end(1), _state.pos_end(2)));
+    q.setW(geoQuat.w);
+    q.setX(geoQuat.x);
+    q.setY(geoQuat.y);
+    q.setZ(geoQuat.z);
+    transform.setRotation(q);
+    br.sendTransform(tf::StampedTransform(transform, odomAftMapped.header.stamp, "camera_init", "aft_mapped"));
+  }
   pubOdomAftMapped.publish(odomAftMapped);
 }
 

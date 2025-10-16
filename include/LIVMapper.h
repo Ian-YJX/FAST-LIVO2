@@ -71,6 +71,7 @@ public:
   
   string root_dir;
   string lid_topic, imu_topic, seq_name, img_topic, odom_topic;
+  bool use_external_odom;
   V3D extT;
   M3D extR;
 

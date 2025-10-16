@@ -37,7 +37,7 @@ def mag_callback(msg):
 
     try:
         # 查找从 livox_frame -> camera_init 的变换
-        trans = tf_buffer.lookup_transform("camera_init", msg.header.frame_id, rospy.Time(0), rospy.Duration(0.1))
+        trans = tf_buffer.lookup_transform("camera_init", "aft_mapped", rospy.Time(0), rospy.Duration(0.1))
     except Exception as e:
         # rospy.logwarn(f"TF lookup failed: {e}")
         return
@@ -113,21 +113,6 @@ if __name__ == "__main__":
     # TF Buffer & Listener
     tf_buffer = tf2_ros.Buffer()
     tf_listener = tf2_ros.TransformListener(tf_buffer)
-
-    # 发布静态TF：aft_mapped 和 livox_frame 重合
-    static_broadcaster = tf2_ros.StaticTransformBroadcaster()
-    static_tf = TransformStamped()
-    static_tf.header.stamp = rospy.Time.now()
-    static_tf.header.frame_id = "aft_mapped"
-    static_tf.child_frame_id = "livox_frame"
-    static_tf.transform.translation.x = 0.0
-    static_tf.transform.translation.y = 0.0
-    static_tf.transform.translation.z = 0.0
-    static_tf.transform.rotation.x = 0.0
-    static_tf.transform.rotation.y = 0.0
-    static_tf.transform.rotation.z = 0.0
-    static_tf.transform.rotation.w = 1.0
-    static_broadcaster.sendTransform(static_tf)
 
     # 订阅磁场点云
     rospy.Subscriber("/mag_array/MagPoints_pc2", PointCloud2, mag_callback)
