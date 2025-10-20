@@ -180,6 +180,7 @@ public:
   image_transport::Publisher pubImage;
   ros::Publisher mavros_pose_publisher;
   ros::Timer imu_prop_timer;
+  ros::Publisher pubMeshCloud;
 
   int frame_num = 0;
   double aver_time_consu = 0;

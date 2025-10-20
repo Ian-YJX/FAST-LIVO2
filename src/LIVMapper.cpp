@@ -220,6 +220,7 @@ void LIVMapper::initializeSubscribersAndPublishers(ros::NodeHandle &nh, image_tr
   pubImuPropOdom = nh.advertise<nav_msgs::Odometry>("/LIVO2/imu_propagate", 10000);
   imu_prop_timer = nh.createTimer(ros::Duration(0.004), &LIVMapper::imu_prop_callback, this);
   voxelmap_manager->voxel_map_pub_ = nh.advertise<visualization_msgs::MarkerArray>("/planes", 10000);
+  pubMeshCloud = nh.advertise<sensor_msgs::PointCloud2>("/mesh_cloud", 100);
 }
 
 void LIVMapper::handleFirstFrame()
@@ -421,6 +422,13 @@ void LIVMapper::handleLIO()
 
   PointCloudXYZI::Ptr world_lidar(new PointCloudXYZI());
   transformLidar(_state.rot_end, _state.pos_end, feats_down_body, world_lidar);
+
+  sensor_msgs::PointCloud2 meshCloudmsg;
+  pcl::toROSMsg(*world_lidar, meshCloudmsg);
+  meshCloudmsg.header.stamp = ros::Time::now();
+  meshCloudmsg.header.frame_id = "camera_init";
+  pubMeshCloud.publish(meshCloudmsg);
+
   for (size_t i = 0; i < world_lidar->points.size(); i++)
   {
     voxelmap_manager->pv_list_[i].point_w << world_lidar->points[i].x, world_lidar->points[i].y, world_lidar->points[i].z;
