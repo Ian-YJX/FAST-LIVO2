@@ -20,6 +20,9 @@ which is included as part of this source code package.
 #include <sensor_msgs/Imu.h>
 #include <sophus/se3.h>
 #include <tf/transform_broadcaster.h>
+#include <tf2_ros/transform_listener.h>
+#include <tf2_ros/buffer.h>
+#include <tf2_sensor_msgs/tf2_sensor_msgs.h>
 
 using namespace std;
 using namespace Eigen;

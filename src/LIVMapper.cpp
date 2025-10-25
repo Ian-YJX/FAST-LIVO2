@@ -14,7 +14,8 @@ which is included as part of this source code package.
 
 LIVMapper::LIVMapper(ros::NodeHandle &nh)
     : extT(0, 0, 0),
-      extR(M3D::Identity())
+      extR(M3D::Identity()),
+      tfListener(tfBuffer)
 {
   extrinT.assign(3, 0.0);
   extrinR.assign(9, 0.0);
@@ -209,6 +210,7 @@ void LIVMapper::initializeSubscribersAndPublishers(ros::NodeHandle &nh, image_tr
   pubLaserCloudEffect = nh.advertise<sensor_msgs::PointCloud2>("/cloud_effected", 100);
   pubLaserCloudMap = nh.advertise<sensor_msgs::PointCloud2>("/Laser_map", 100);
   pubOdomAftMapped = nh.advertise<nav_msgs::Odometry>("/aft_mapped_to_init", 10);
+  pubLaserCloudBody = nh.advertise<sensor_msgs::PointCloud2>("/cloud_registered_body", 100);
   pubPath = nh.advertise<nav_msgs::Path>("/path", 10);
   plane_pub = nh.advertise<visualization_msgs::Marker>("/planner_normal", 1);
   voxel_pub = nh.advertise<visualization_msgs::MarkerArray>("/voxels", 1);
@@ -417,17 +419,18 @@ void LIVMapper::handleLIO()
   euler_cur = RotMtoEuler(_state.rot_end);
   geoQuat = tf::createQuaternionMsgFromRollPitchYaw(euler_cur(0), euler_cur(1), euler_cur(2));
   publish_odometry(pubOdomAftMapped);
+  publish_frame_body(pubLaserCloudBody);
 
   double t3 = omp_get_wtime();
 
   PointCloudXYZI::Ptr world_lidar(new PointCloudXYZI());
   transformLidar(_state.rot_end, _state.pos_end, feats_down_body, world_lidar);
 
-  sensor_msgs::PointCloud2 meshCloudmsg;
-  pcl::toROSMsg(*world_lidar, meshCloudmsg);
-  meshCloudmsg.header.stamp = ros::Time::now();
-  meshCloudmsg.header.frame_id = "camera_init";
-  pubMeshCloud.publish(meshCloudmsg);
+  // sensor_msgs::PointCloud2 meshCloudmsg;
+  // pcl::toROSMsg(*world_lidar, meshCloudmsg);
+  // meshCloudmsg.header.stamp = ros::Time::now();
+  // meshCloudmsg.header.frame_id = "camera_init";
+  // pubMeshCloud.publish(meshCloudmsg);
 
   for (size_t i = 0; i < world_lidar->points.size(); i++)
   {
@@ -1230,7 +1233,6 @@ void LIVMapper::publish_frame_world(const ros::Publisher &pubLaserCloudFullRes, 
   }
 
   /*** Publish Frame ***/
-  sensor_msgs::PointCloud2 laserCloudmsg;
   if (img_en)
   {
     // cout << "RGB pointcloud size: " << laserCloudWorldRGB->size() << endl;
@@ -1293,23 +1295,23 @@ void LIVMapper::publish_frame_world(const ros::Publisher &pubLaserCloudFullRes, 
   PointCloudXYZI().swap(*pcl_w_wait_pub);
 }
 
-void LIVMapper::publish_visual_sub_map(const ros::Publisher &pubSubVisualMap)
-{
-  PointCloudXYZI::Ptr laserCloudFullRes(visual_sub_map);
-  int size = laserCloudFullRes->points.size();
-  if (size == 0)
-    return;
-  PointCloudXYZI::Ptr sub_pcl_visual_map_pub(new PointCloudXYZI());
-  *sub_pcl_visual_map_pub = *laserCloudFullRes;
-  if (1)
-  {
-    sensor_msgs::PointCloud2 laserCloudmsg;
-    pcl::toROSMsg(*sub_pcl_visual_map_pub, laserCloudmsg);
-    laserCloudmsg.header.stamp = ros::Time::now();
-    laserCloudmsg.header.frame_id = "camera_init";
-    pubSubVisualMap.publish(laserCloudmsg);
-  }
-}
+// void LIVMapper::publish_visual_sub_map(const ros::Publisher &pubSubVisualMap)
+// {
+//   PointCloudXYZI::Ptr laserCloudFullRes(visual_sub_map);
+//   int size = laserCloudFullRes->points.size();
+//   if (size == 0)
+//     return;
+//   PointCloudXYZI::Ptr sub_pcl_visual_map_pub(new PointCloudXYZI());
+//   *sub_pcl_visual_map_pub = *laserCloudFullRes;
+//   if (1)
+//   {
+//     // sensor_msgs::PointCloud2 laserCloudmsg;
+//     pcl::toROSMsg(*sub_pcl_visual_map_pub, laserCloudmsg);
+//     laserCloudmsg.header.stamp = ros::Time::now();
+//     laserCloudmsg.header.frame_id = "camera_init";
+//     pubSubVisualMap.publish(laserCloudmsg);
+//   }
+// }
 
 void LIVMapper::publish_effect_world(const ros::Publisher &pubLaserCloudEffect, const std::vector<PointToPlane> &ptpl_list)
 {
@@ -1382,4 +1384,31 @@ void LIVMapper::publish_path(const ros::Publisher pubPath)
   msg_body_pose.header.frame_id = "camera_init";
   path.poses.push_back(msg_body_pose);
   pubPath.publish(path);
+}
+
+void LIVMapper::publish_frame_body(const ros::Publisher &pubLaserCloudBody)
+{
+  if (laserCloudmsg.data.empty()) return;  // 防止空消息
+
+  geometry_msgs::TransformStamped tf_camera2map;
+  try {
+    tf_camera2map = tfBuffer.lookupTransform("aft_mapped", "camera_init", ros::Time(0), ros::Duration(0.1));
+  } catch (tf2::TransformException &ex) {
+    ROS_WARN("TF lookup failed: %s", ex.what());
+    return;
+  }
+
+  sensor_msgs::PointCloud2 bodyCloudmsg;
+  try {
+    tf2::doTransform(laserCloudmsg, bodyCloudmsg, tf_camera2map);
+  } catch (const std::exception &e) {
+    ROS_ERROR("Transform failed: %s", e.what());
+    return;
+  }
+
+  bodyCloudmsg.header.frame_id = "aft_mapped";
+  pubLaserCloudBody.publish(bodyCloudmsg);
+
+  if (feats_down_body->empty())
+    return;
 }

@@ -1,4 +1,4 @@
-/* 
+/*
 This file is part of FAST-LIVO2: Fast, Direct LiDAR-Inertial-Visual Odometry.
 
 Developer: Chunran Zheng <zhengcr@connect.hku.hk>
@@ -37,13 +37,13 @@ public:
   void handleLIO();
   void savePCD();
   void processImu();
-  
+
   bool sync_packages(LidarMeasureGroup &meas);
   void prop_imu_once(StatesGroup &imu_prop_state, const double dt, V3D acc_avr, V3D angvel_avr);
   void imu_prop_callback(const ros::TimerEvent &e);
   void transformLidar(const Eigen::Matrix3d rot, const Eigen::Vector3d t, const PointCloudXYZI::Ptr &input_cloud, PointCloudXYZI::Ptr &trans_cloud);
   void pointBodyToWorld(const PointType &pi, PointType &po);
- 
+
   void RGBpointBodyToWorld(PointType const *const pi, PointType *const po);
   void standard_pcl_cbk(const sensor_msgs::PointCloud2::ConstPtr &msg);
   void livox_pcl_cbk(const livox_ros_driver::CustomMsg::ConstPtr &msg_in);
@@ -52,15 +52,19 @@ public:
   void odom_cbk(const nav_msgs::Odometry::ConstPtr &msg_in);
   void publish_img_rgb(const image_transport::Publisher &pubImage, VIOManagerPtr vio_manager);
   void publish_frame_world(const ros::Publisher &pubLaserCloudFullRes, VIOManagerPtr vio_manager);
-  void publish_visual_sub_map(const ros::Publisher &pubSubVisualMap);
+  // void publish_visual_sub_map(const ros::Publisher &pubSubVisualMap);
   void publish_effect_world(const ros::Publisher &pubLaserCloudEffect, const std::vector<PointToPlane> &ptpl_list);
+  void publish_frame_body(const ros::Publisher &pubLaserCloudBody);
   void publish_odometry(const ros::Publisher &pubOdomAftMapped);
   void publish_mavros(const ros::Publisher &mavros_pose_publisher);
   void publish_path(const ros::Publisher pubPath);
   void readParameters(ros::NodeHandle &nh);
-  template <typename T> void set_posestamp(T &out);
-  template <typename T> void pointBodyToWorld(const Eigen::Matrix<T, 3, 1> &pi, Eigen::Matrix<T, 3, 1> &po);
-  template <typename T> Eigen::Matrix<T, 3, 1> pointBodyToWorld(const Eigen::Matrix<T, 3, 1> &pi);
+  template <typename T>
+  void set_posestamp(T &out);
+  template <typename T>
+  void pointBodyToWorld(const Eigen::Matrix<T, 3, 1> &pi, Eigen::Matrix<T, 3, 1> &po);
+  template <typename T>
+  Eigen::Matrix<T, 3, 1> pointBodyToWorld(const Eigen::Matrix<T, 3, 1> &pi);
   cv::Mat getImageFromMsg(const sensor_msgs::ImageConstPtr &img_msg);
 
   std::mutex mtx_buffer, mtx_buffer_imu_prop;
@@ -68,7 +72,7 @@ public:
 
   SLAM_MODE slam_mode_;
   std::unordered_map<VOXEL_LOCATION, VoxelOctoTree *> voxel_map;
-  
+
   string root_dir;
   string lid_topic, imu_topic, seq_name, img_topic, odom_topic;
   bool use_external_odom;
@@ -149,12 +153,14 @@ public:
 
   LidarMeasureGroup LidarMeasures;
   StatesGroup _state;
-  StatesGroup  state_propagat;
+  StatesGroup state_propagat;
 
   nav_msgs::Path path;
   nav_msgs::Odometry odomAftMapped;
   geometry_msgs::Quaternion geoQuat;
   geometry_msgs::PoseStamped msg_body_pose;
+  sensor_msgs::PointCloud2 bodyCloudmsg;
+  sensor_msgs::PointCloud2 laserCloudmsg;
 
   PreprocessPtr p_pre;
   ImuProcessPtr p_imu;
@@ -177,10 +183,15 @@ public:
   ros::Publisher pubLaserCloudDyn;
   ros::Publisher pubLaserCloudDynRmed;
   ros::Publisher pubLaserCloudDynDbg;
+  ros::Publisher pubLaserCloudBody;
   image_transport::Publisher pubImage;
   ros::Publisher mavros_pose_publisher;
   ros::Timer imu_prop_timer;
   ros::Publisher pubMeshCloud;
+
+  tf2_ros::Buffer tfBuffer;
+  tf2_ros::TransformListener tfListener;
+  // tf2_ros::TransformListener tfListener(tfBuffer);
 
   int frame_num = 0;
   double aver_time_consu = 0;
