@@ -9,7 +9,7 @@
 	<rosparam command="load" file="$(find fast_livo)/config/realsense.yaml" />
 	<rosparam command="load" file="$(find std_detector)/config/config_online.yaml" />
 
-	<node pkg="fast_livo" type="mag_field_visualizer.py" name="mag_field_visualizer" output="screen"/>
+	<!-- <node pkg="fast_livo" type="mag_field_visualizer.py" name="mag_field_visualizer" output="screen"/> -->
 
 	<node pkg="fast_livo" type="fastlivo_mapping" name="laserMapping" output="screen">
 		<rosparam file="$(find fast_livo)/config/camera_realsense.yaml" />
