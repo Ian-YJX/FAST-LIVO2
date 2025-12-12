@@ -15,13 +15,13 @@
 	<!-- <node pkg="std_detector" type="online_demo"	name="online_demo" output="screen"/> -->
 	<node
 		pkg="std_detector"
-		type="online_multi_session_demo"
-		name="online_multi_session_demo"
+		type="offline_multi_session_demo"
+		name="offline_multi_session_demo"
 		output="screen"
     launch-prefix="gdb -ex run --args"
 	/>
 	<group if="$(arg rviz)">
 		<!-- <node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz_livo" args="-d $(find fast_livo)/rviz_cfg/fast_livo2.rviz" /> -->
-		<node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz_std" args="-d $(find std_detector)/rviz_cfg/online.rviz" />
+		<node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz_std" args="-d $(find std_detector)/rviz_cfg/online_ms.rviz" />
 	</group>
 </launch> 	

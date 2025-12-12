@@ -88,7 +88,7 @@ struct EIGEN_ALIGN16 Point
   float intensity;
   std::uint32_t t;
   std::uint16_t reflectivity;
-  uint8_t ring;
+  uint16_t ring;
   std::uint16_t ambient;
   std::uint32_t range;
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
