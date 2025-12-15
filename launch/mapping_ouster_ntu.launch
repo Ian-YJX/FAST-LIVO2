@@ -15,8 +15,8 @@
 	<!-- <node pkg="std_detector" type="online_demo"	name="online_demo" output="screen"/> -->
 	<node
 		pkg="std_detector"
-		type="offline_multi_session_demo"
-		name="offline_multi_session_demo"
+		type="online_multi_session_demo"
+		name="online_multi_session_demo"
 		output="screen"
     launch-prefix="gdb -ex run --args"
 	/>
