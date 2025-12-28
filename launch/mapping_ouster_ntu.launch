@@ -4,7 +4,7 @@
 	<arg name="rviz" default="true" />
 
 	<rosparam command="load" file="$(find fast_livo)/config/ouster.yaml" />
-	<rosparam command="load" file="$(find std_detector)/config/config_online.yaml" />
+	<!-- <rosparam command="load" file="$(find std_detector)/config/config_online.yaml" /> -->
 
 	<node pkg="image_transport" type="republish" name="republish" 
       args="compressed in:=/camera/color/image_raw raw out:=/camera/color/image_raw" 
@@ -12,16 +12,5 @@
 	<node pkg="fast_livo" type="fastlivo_mapping" name="laserMapping" output="screen">
 		<rosparam file="$(find fast_livo)/config/camera_realsense.yaml" />
 	</node>
-	<!-- <node pkg="std_detector" type="online_demo"	name="online_demo" output="screen"/> -->
-	<node
-		pkg="std_detector"
-		type="online_multi_session_demo"
-		name="online_multi_session_demo"
-		output="screen"
-    launch-prefix="gdb -ex run --args"
-	/>
-	<group if="$(arg rviz)">
-		<!-- <node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz_livo" args="-d $(find fast_livo)/rviz_cfg/fast_livo2.rviz" /> -->
-		<node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz_std" args="-d $(find std_detector)/rviz_cfg/online_ms.rviz" />
-	</group>
+
 </launch> 	

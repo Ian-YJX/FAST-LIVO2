@@ -482,21 +482,21 @@ void LIVMapper::handleLIO()
   //         "[ mapping time ]: average: icp: %0.6f construct H: %0.6f, total: %0.6f \n",
   //         t_prop - t0, t1 - t_prop, match_time, solve_time, t3 - t1, t5 - t3, t5 - t0, aver_time_icp, aver_time_const_H_time, aver_time_consu);
 
-  // printf("\033[1;36m[ LIO mapping time ]: current scan: icp: %0.6f secs, map incre: %0.6f secs, total: %0.6f secs.\033[0m\n"
-  //         "\033[1;36m[ LIO mapping time ]: average: icp: %0.6f secs, map incre: %0.6f secs, total: %0.6f secs.\033[0m\n",
-  //         t2 - t1, t4 - t3, t4 - t0, aver_time_icp, aver_time_map_inre, aver_time_consu);
-  // printf("\033[1;34m+-------------------------------------------------------------+\033[0m\n");
-  // printf("\033[1;34m|                         LIO Mapping Time                    |\033[0m\n");
-  // printf("\033[1;34m+-------------------------------------------------------------+\033[0m\n");
-  // printf("\033[1;34m| %-29s | %-27s |\033[0m\n", "Algorithm Stage", "Time (secs)");
-  // printf("\033[1;34m+-------------------------------------------------------------+\033[0m\n");
-  // printf("\033[1;36m| %-29s | %-27f |\033[0m\n", "DownSample", t_down - t0);
-  // printf("\033[1;36m| %-29s | %-27f |\033[0m\n", "ICP", t2 - t1);
-  // printf("\033[1;36m| %-29s | %-27f |\033[0m\n", "updateVoxelMap", t4 - t3);
-  // printf("\033[1;34m+-------------------------------------------------------------+\033[0m\n");
-  // printf("\033[1;36m| %-29s | %-27f |\033[0m\n", "Current Total Time", t4 - t0);
-  // printf("\033[1;36m| %-29s | %-27f |\033[0m\n", "Average Total Time", aver_time_consu);
-  // printf("\033[1;34m+-------------------------------------------------------------+\033[0m\n");
+  printf("\033[1;36m[ LIO mapping time ]: current scan: icp: %0.6f secs, map incre: %0.6f secs, total: %0.6f secs.\033[0m\n"
+          "\033[1;36m[ LIO mapping time ]: average: icp: %0.6f secs, map incre: %0.6f secs, total: %0.6f secs.\033[0m\n",
+          t2 - t1, t4 - t3, t4 - t0, aver_time_icp, aver_time_map_inre, aver_time_consu);
+  printf("\033[1;34m+-------------------------------------------------------------+\033[0m\n");
+  printf("\033[1;34m|                         LIO Mapping Time                    |\033[0m\n");
+  printf("\033[1;34m+-------------------------------------------------------------+\033[0m\n");
+  printf("\033[1;34m| %-29s | %-27s |\033[0m\n", "Algorithm Stage", "Time (secs)");
+  printf("\033[1;34m+-------------------------------------------------------------+\033[0m\n");
+  printf("\033[1;36m| %-29s | %-27f |\033[0m\n", "DownSample", t_down - t0);
+  printf("\033[1;36m| %-29s | %-27f |\033[0m\n", "ICP", t2 - t1);
+  printf("\033[1;36m| %-29s | %-27f |\033[0m\n", "updateVoxelMap", t4 - t3);
+  printf("\033[1;34m+-------------------------------------------------------------+\033[0m\n");
+  printf("\033[1;36m| %-29s | %-27f |\033[0m\n", "Current Total Time", t4 - t0);
+  printf("\033[1;36m| %-29s | %-27f |\033[0m\n", "Average Total Time", aver_time_consu);
+  printf("\033[1;34m+-------------------------------------------------------------+\033[0m\n");
 
   euler_cur = RotMtoEuler(_state.rot_end);
   fout_out << std::setw(20) << LidarMeasures.last_lio_update_time - _first_lidar_time << " " << euler_cur.transpose() * 57.3 << " "
