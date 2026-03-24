@@ -5,20 +5,15 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Status1
+        - /mapping1
         - /mapping1/currPoints1
         - /mapping1/surround1
         - /mapping1/surround1/Autocompute Value Bounds1
         - /mapping1/PointCloud21
         - /Odometry1/Odometry1
         - /Odometry1/Odometry1/Shape1
-        - /currPoints1/Autocompute Value Bounds1
         - /MarkerArray1/Namespaces1
-        - /MFPointsx1
-        - /MFPointsx1/Autocompute Value Bounds1
-        - /Odometry2/Shape1
-        - /MFPointsy1/Autocompute Value Bounds1
-        - /MFPointsz1/Autocompute Value Bounds1
-      Splitter Ratio: 0.34272301197052
+      Splitter Ratio: 0.3435114622116089
     Tree Height: 364
   - Class: rviz/Selection
     Name: Selection
@@ -86,7 +81,7 @@ Visualization Manager:
           Color: 239; 41; 41
           Color Transformer: FlatColor
           Decay Time: 0
-          Enabled: true
+          Enabled: false
           Invert Rainbow: false
           Max Color: 255; 255; 255
           Min Color: 0; 0; 0
@@ -101,7 +96,7 @@ Visualization Manager:
           Unreliable: false
           Use Fixed Frame: true
           Use rainbow: false
-          Value: true
+          Value: false
         - Alpha: 1
           Autocompute Intensity Bounds: false
           Autocompute Value Bounds:
@@ -124,8 +119,8 @@ Visualization Manager:
           Position Transformer: XYZ
           Queue Size: 1
           Selectable: false
-          Size (Pixels): 1
-          Size (m): 0.004999999888241291
+          Size (Pixels): 2
+          Size (m): 0.05000000074505806
           Style: Points
           Topic: /cloud_registered
           Unreliable: true
@@ -225,34 +220,6 @@ Visualization Manager:
       Topic: /path
       Unreliable: false
       Value: true
-    - Alpha: 0.10000000149011612
-      Autocompute Intensity Bounds: true
-      Autocompute Value Bounds:
-        Max Value: 20
-        Min Value: -3
-        Value: false
-      Axis: Z
-      Channel Name: intensity
-      Class: rviz/PointCloud2
-      Color: 239; 41; 41
-      Color Transformer: Intensity
-      Decay Time: 1000
-      Enabled: true
-      Invert Rainbow: true
-      Max Color: 255; 255; 255
-      Min Color: 0; 0; 0
-      Name: currPoints
-      Position Transformer: XYZ
-      Queue Size: 1
-      Selectable: true
-      Size (Pixels): 2
-      Size (m): 0.009999999776482582
-      Style: Points
-      Topic: /cloud_voxel
-      Unreliable: false
-      Use Fixed Frame: true
-      Use rainbow: true
-      Value: true
     - Class: rviz/Marker
       Enabled: true
       Marker Topic: /planner_normal
@@ -269,34 +236,6 @@ Visualization Manager:
         {}
       Queue Size: 100
       Value: false
-    - Alpha: 1
-      Autocompute Intensity Bounds: true
-      Autocompute Value Bounds:
-        Max Value: 10
-        Min Value: -10
-        Value: true
-      Axis: Z
-      Channel Name: intensity
-      Class: rviz/PointCloud2
-      Color: 245; 121; 0
-      Color Transformer: FlatColor
-      Decay Time: 0
-      Enabled: false
-      Invert Rainbow: false
-      Max Color: 255; 255; 255
-      Min Color: 0; 0; 0
-      Name: PointCloud2
-      Position Transformer: XYZ
-      Queue Size: 1
-      Selectable: true
-      Size (Pixels): 15
-      Size (m): 0.009999999776482582
-      Style: Points
-      Topic: /cloud_ray_sub_map
-      Unreliable: false
-      Use Fixed Frame: true
-      Use rainbow: true
-      Value: false
     - Class: rviz/MarkerArray
       Enabled: false
       Marker Topic: /visualization_marker
@@ -305,219 +244,16 @@ Visualization Manager:
         {}
       Queue Size: 100
       Value: false
-    - Alpha: 1
-      Autocompute Intensity Bounds: true
-      Autocompute Value Bounds:
-        Max Value: 10
-        Min Value: -10
-        Value: true
-      Axis: Z
-      Channel Name: intensity
-      Class: rviz/PointCloud2
-      Color: 92; 53; 102
-      Color Transformer: FlatColor
-      Decay Time: 99999
-      Enabled: false
-      Invert Rainbow: false
-      Max Color: 255; 255; 255
-      Min Color: 0; 0; 0
-      Name: PointCloud2
-      Position Transformer: XYZ
-      Queue Size: 10
-      Selectable: true
-      Size (Pixels): 10
-      Size (m): 0.009999999776482582
-      Style: Points
-      Topic: /cloud_visual_map
-      Unreliable: false
-      Use Fixed Frame: true
-      Use rainbow: true
-      Value: false
-    - Alpha: 1
-      Autocompute Intensity Bounds: true
-      Autocompute Value Bounds:
-        Max Value: 20
-        Min Value: -3
-        Value: false
-      Axis: Z
-      Channel Name: intensity
-      Class: rviz/PointCloud2
-      Color: 237; 212; 0
-      Color Transformer: Intensity
-      Decay Time: 0
-      Enabled: true
-      Invert Rainbow: false
-      Max Color: 255; 255; 255
-      Min Color: 0; 0; 0
-      Name: MFPointsx
-      Position Transformer: XYZ
-      Queue Size: 100000
-      Selectable: true
-      Size (Pixels): 5
-      Size (m): 0.009999999776482582
-      Style: Points
-      Topic: /mag_cloud/magnitude_x
-      Unreliable: false
-      Use Fixed Frame: true
-      Use rainbow: true
-      Value: true
-    - Alpha: 1
-      Autocompute Intensity Bounds: true
-      Autocompute Value Bounds:
-        Max Value: 0.5658242106437683
-        Min Value: -0.947810709476471
-        Value: true
-      Axis: Z
-      Channel Name: intensity
-      Class: rviz/PointCloud2
-      Color: 239; 41; 41
-      Color Transformer: RGB8
-      Decay Time: 0
-      Enabled: false
-      Invert Rainbow: false
-      Max Color: 255; 255; 255
-      Min Color: 239; 41; 41
-      Name: MFPoints
-      Position Transformer: XYZ
-      Queue Size: 10
-      Selectable: true
-      Size (Pixels): 4
-      Size (m): 0.009999999776482582
-      Style: Points
-      Topic: /mag_cloud/magnitude
-      Unreliable: false
-      Use Fixed Frame: true
-      Use rainbow: true
-      Value: false
-    - Alpha: 1
-      Autocompute Intensity Bounds: true
-      Autocompute Value Bounds:
-        Max Value: 10
-        Min Value: -10
-        Value: true
-      Axis: Z
-      Channel Name: intensity
-      Class: rviz/PointCloud2
-      Color: 92; 53; 102
-      Color Transformer: FlatColor
-      Decay Time: 0
-      Enabled: false
-      Invert Rainbow: false
-      Max Color: 255; 255; 255
-      Min Color: 0; 0; 0
-      Name: PointCloud2
-      Position Transformer: XYZ
-      Queue Size: 10
-      Selectable: true
-      Size (Pixels): 20
-      Size (m): 0.009999999776482582
-      Style: Points
-      Topic: /cloud_ray_sub_map_fov
-      Unreliable: false
-      Use Fixed Frame: true
-      Use rainbow: true
-      Value: false
-    - Angle Tolerance: 0
-      Class: rviz/Odometry
-      Covariance:
-        Orientation:
-          Alpha: 0.5
-          Color: 255; 255; 127
-          Color Style: Unique
-          Frame: Local
-          Offset: 1
-          Scale: 1
-          Value: true
-        Position:
-          Alpha: 0.30000001192092896
-          Color: 204; 51; 204
-          Scale: 1
-          Value: true
-        Value: true
-      Enabled: false
-      Keep: 1
-      Name: Odometry
-      Position Tolerance: 0
-      Queue Size: 10
-      Shape:
-        Alpha: 1
-        Axes Length: 0.699999988079071
-        Axes Radius: 0.20000000298023224
-        Color: 255; 25; 0
-        Head Length: 0.30000001192092896
-        Head Radius: 0.10000000149011612
-        Shaft Length: 1
-        Shaft Radius: 0.05000000074505806
-        Value: Axes
-      Topic: /aft_mapped_to_init
-      Unreliable: false
-      Value: false
-    - Alpha: 1
-      Autocompute Intensity Bounds: true
-      Autocompute Value Bounds:
-        Max Value: 20
-        Min Value: -3
-        Value: false
-      Axis: Z
-      Channel Name: intensity
-      Class: rviz/PointCloud2
-      Color: 237; 212; 0
-      Color Transformer: Intensity
-      Decay Time: 0
-      Enabled: false
-      Invert Rainbow: false
-      Max Color: 255; 255; 255
-      Min Color: 0; 0; 0
-      Name: MFPointsy
-      Position Transformer: XYZ
-      Queue Size: 100000
-      Selectable: true
-      Size (Pixels): 5
-      Size (m): 0.009999999776482582
-      Style: Points
-      Topic: /mag_cloud/magnitude_y
-      Unreliable: false
-      Use Fixed Frame: true
-      Use rainbow: true
-      Value: false
-    - Alpha: 1
-      Autocompute Intensity Bounds: true
-      Autocompute Value Bounds:
-        Max Value: 20
-        Min Value: -3
-        Value: false
-      Axis: Z
-      Channel Name: intensity
-      Class: rviz/PointCloud2
-      Color: 237; 212; 0
-      Color Transformer: Intensity
-      Decay Time: 0
-      Enabled: false
-      Invert Rainbow: false
-      Max Color: 255; 255; 255
-      Min Color: 0; 0; 0
-      Name: MFPointsz
-      Position Transformer: XYZ
-      Queue Size: 100000
-      Selectable: true
-      Size (Pixels): 5
-      Size (m): 0.009999999776482582
-      Style: Points
-      Topic: /mag_cloud/magnitude_z
-      Unreliable: false
-      Use Fixed Frame: true
-      Use rainbow: true
-      Value: false
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /camera/color/image_raw
+      Image Topic: /semantic_inference/semantic_color/image_raw
       Max Value: 1
       Median window: 5
       Min Value: 0
       Name: Image
       Normalize Range: true
       Queue Size: 2
-      Transport Hint: compressed
+      Transport Hint: raw
       Unreliable: false
       Value: true
   Enabled: true
@@ -548,7 +284,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/ThirdPersonFollower
-      Distance: 62.565086364746094
+      Distance: 65.51353454589844
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -556,17 +292,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 34.06993865966797
-        Y: -8.549582481384277
-        Z: 2.422724719508551e-05
+        X: 43.273170471191406
+        Y: 1.645627737045288
+        Z: 4.49199287686497e-05
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.3597975969314575
+      Pitch: 0.5497957468032837
       Target Frame: drone
-      Yaw: 5.173107624053955
+      Yaw: 3.2880966663360596
     Saved:
       - Class: rviz/Orbit
         Distance: 117.53474426269531

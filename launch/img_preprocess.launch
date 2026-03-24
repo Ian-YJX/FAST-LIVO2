@@ -1,0 +1,44 @@
+<launch>
+  <arg name="semantic" default="false" />
+  <arg name="resize_width"  default="800" />
+  <arg name="resize_height" default="450" />
+
+  <!-- 1) compressed -> raw
+       输入:  /camera/color/image_raw/compressed
+       输出:  /camera/color/image_raw
+  -->
+  <node pkg="image_transport" type="republish" name="color_republish"
+        args="compressed in:=/realsense/color/image_raw raw out:=/realsense/color/image_raw"
+        output="screen" respawn="true" />
+
+      <group if="$(arg semantic)">
+            <!-- 2) nodelet manager -->
+            <node pkg="nodelet" type="nodelet" name="image_proc_manager"
+                  args="manager"
+                  output="screen" />
+
+            <!-- 3) resize
+                  输入:  /camera/color/image_raw
+                  输出:  /semantic_inference/color/image_raw
+                        /semantic_inference/color/camera_info
+            -->
+            <node pkg="nodelet" type="nodelet" name="semantic_inference_resize"
+                  args="load image_proc/resize image_proc_manager"
+                  output="screen" respawn="false">
+
+            <!-- 输入 remap -->
+            <remap from="image" to="/realsense/color/image_raw" />
+            <remap from="camera_info" to="/realsense/color/camera_info" />
+
+            <!-- 输出 remap：因为 resize nodelet 的输出发布在私有命名空间 -->
+            <remap from="~image" to="/semantic_inference/color/image_raw" />
+            <remap from="~camera_info" to="/semantic_inference/color/camera_info" />
+
+            <param name="use_scale" value="false" />
+            <param name="width"  value="$(arg resize_width)" />
+            <param name="height" value="$(arg resize_height)" />
+            </node>
+            <include file="$(find semantic_inference_ros)/launch/semantic_inference.launch"/>
+	</group>
+
+</launch>
