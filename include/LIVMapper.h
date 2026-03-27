@@ -49,6 +49,7 @@ public:
   void livox_pcl_cbk(const livox_ros_driver::CustomMsg::ConstPtr &msg_in);
   void imu_cbk(const sensor_msgs::Imu::ConstPtr &msg_in);
   void img_cbk(const sensor_msgs::ImageConstPtr &msg_in);
+  void semantic_cbk(const sensor_msgs::ImageConstPtr &msg_in);
   void odom_cbk(const nav_msgs::Odometry::ConstPtr &msg_in);
   void publish_img_rgb(const image_transport::Publisher &pubImage, VIOManagerPtr vio_manager);
   void publish_frame_world(const ros::Publisher &pubLaserCloudFullRes, VIOManagerPtr vio_manager);
@@ -74,7 +75,7 @@ public:
   std::unordered_map<VOXEL_LOCATION, VoxelOctoTree *> voxel_map;
 
   string root_dir;
-  string lid_topic, imu_topic, seq_name, img_topic, odom_topic;
+  string lid_topic, imu_topic, seq_name, img_topic, odom_topic, semantic_topic;
   bool use_external_odom;
   V3D extT;
   M3D extR;
@@ -111,7 +112,7 @@ public:
 
   bool lidar_pushed = false, imu_en, gravity_est_en, flg_reset = false, ba_bg_est_en = true;
   bool dense_map_en = false;
-  int img_en = 1, imu_int_frame = 3;
+  int img_en = 1, semantic_en = 1, imu_int_frame = 3;
   bool normal_en = true;
   bool exposure_estimate_en = false;
   double exposure_time_init = 0.0;
@@ -129,6 +130,10 @@ public:
   deque<sensor_msgs::Imu::ConstPtr> imu_buffer;
   deque<cv::Mat> img_buffer;
   deque<double> img_time_buffer;
+  
+  std::mutex mtx_semantic;
+  cv::Mat latest_semantic_img;
+  
   vector<pointWithVar> _pv_list;
   vector<double> extrinT;
   vector<double> extrinR;
@@ -172,6 +177,7 @@ public:
   ros::Subscriber sub_pcl;
   ros::Subscriber sub_imu;
   ros::Subscriber sub_img;
+  ros::Subscriber sub_semantic;
   ros::Subscriber sub_odom;
   ros::Publisher pubLaserCloudFullRes;
   ros::Publisher pubNormal;

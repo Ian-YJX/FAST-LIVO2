@@ -1,0 +1,63 @@
+common:
+  img_topic: "/camera_array/cam2/image_raw"
+  semantic_topic: ""
+  lid_topic: "/ouster/points"
+  imu_topic: "/ouster/imu"
+  img_en: 1
+  semantic_en: 0
+  lidar_en: 1
+  ros_driver_bug_fix: false
+  use_external_odom : false
+  odometry_topic: "/aft_mapped_to_init_mesh"
+
+extrin_calib:
+  # Ouster internal IMU is typically aligned perfectly with the sensor
+  extrinsic_T: [0.0, 0.0, 0.0]
+  extrinsic_R: [1, 0, 0, 0, 1, 0, 0, 0, 1]
+  
+  # Standard Robot Forward-facing Camera to LiDAR alignment
+  # Camera Z is Lidar X. Camera X is Lidar -Y. Camera Y is Lidar -Z.
+  Rcl: [0, 0, 1, 
+       -1, 0, 0, 
+        0, -1, 0] 
+  # Approximate translation from LiDAR (back) to ZED (front) based on typical rig (approx 40cm forward)
+  Pcl: [0.40, 0.00, -0.10]
+
+time_offset: 
+  exposure_time_init: 0.0
+  img_time_offset: 0.0
+  imu_time_offset: 0.0
+  lidar_time_offset: 0.0
+
+pcd_save:
+  pcd_save_en: false
+  interval: -1
+
+
+
+vio:
+  max_iterations: 5
+  outlier_threshold: 300
+  grid_size: 50
+  patch_size: 4
+  img_point_cov: 50
+  patch_pyrimid_level: 1
+  inverse_composition_en: false
+  exposure_estimate_en: true
+
+imu:
+  imu_en: true
+  gravity_est_en: true
+  ba_bg_est_en: true
+
+preprocess:
+  lidar_type: 3
+  scan_line: 128
+  blind: 0.5
+  point_filter_num: 3
+  feature_extract_enabled: false
+
+publish:
+  blind_rgb_points: 0.1
+  pub_effect_point_en: false
+  dense_map_en: true

@@ -54,8 +54,10 @@ void LIVMapper::readParameters(ros::NodeHandle &nh)
   nh.param<string>("common/imu_topic", imu_topic, "/livox/imu");
   nh.param<bool>("common/ros_driver_bug_fix", ros_driver_fix_en, false);
   nh.param<int>("common/img_en", img_en, 1);
+  nh.param<int>("common/semantic_en", semantic_en, 1);
   nh.param<int>("common/lidar_en", lidar_en, 1);
   nh.param<string>("common/img_topic", img_topic, "/left_camera/image");
+  nh.param<string>("common/semantic_topic", semantic_topic, "");
   nh.param<bool>("common/use_external_odom", use_external_odom, false);
   nh.param<string>("common/odometry_topic", odom_topic, "/aft_mapped_to_init_mesh");
   nh.param<bool>("vio/normal_en", normal_en, true);
@@ -201,6 +203,8 @@ void LIVMapper::initializeSubscribersAndPublishers(ros::NodeHandle &nh, image_tr
   sub_pcl = p_pre->lidar_type == AVIA ? nh.subscribe(lid_topic, 200000, &LIVMapper::livox_pcl_cbk, this) : nh.subscribe(lid_topic, 200000, &LIVMapper::standard_pcl_cbk, this);
   sub_imu = nh.subscribe(imu_topic, 200000, &LIVMapper::imu_cbk, this);
   sub_img = nh.subscribe(img_topic, 200000, &LIVMapper::img_cbk, this);
+  if (semantic_topic != "")
+    sub_semantic = nh.subscribe(semantic_topic, 100, &LIVMapper::semantic_cbk, this);
   if (use_external_odom)
     sub_odom = nh.subscribe(odom_topic, 10, &LIVMapper::odom_cbk, this);
 
@@ -911,6 +915,21 @@ void LIVMapper::img_cbk(const sensor_msgs::ImageConstPtr &msg_in)
   sig_buffer.notify_all();
 }
 
+void LIVMapper::semantic_cbk(const sensor_msgs::ImageConstPtr &msg_in)
+{
+  if (!semantic_en) return;
+  cv::Mat img;
+  try {
+      img = cv_bridge::toCvCopy(msg_in, "bgr8")->image;
+  } catch (cv_bridge::Exception& e) {
+      ROS_ERROR("cv_bridge exception: %s", e.what());
+      return;
+  }
+  mtx_semantic.lock();
+  latest_semantic_img = img;
+  mtx_semantic.unlock();
+}
+
 void LIVMapper::odom_cbk(const nav_msgs::Odometry::ConstPtr &msg)
 {
   odomAftMapped.header.frame_id = msg->header.frame_id;
@@ -1195,6 +1214,17 @@ void LIVMapper::publish_frame_world(const ros::Publisher &pubLaserCloudFullRes, 
       laserCloudWorldRGB->reserve(size);
       // double inv_expo = _state.inv_expo_time;
       cv::Mat img_rgb = vio_manager->img_rgb;
+      
+      mtx_semantic.lock();
+      if (!latest_semantic_img.empty() && img_rgb.cols > 0) {
+          if (latest_semantic_img.cols != img_rgb.cols || latest_semantic_img.rows != img_rgb.rows) {
+              cv::resize(latest_semantic_img, img_rgb, cv::Size(img_rgb.cols, img_rgb.rows), 0, 0, cv::INTER_NEAREST);
+          } else {
+              img_rgb = latest_semantic_img.clone();
+          }
+      }
+      mtx_semantic.unlock();
+
       for (size_t i = 0; i < size; i++)
       {
         PointTypeRGB pointRGB;
@@ -1291,7 +1321,7 @@ void LIVMapper::publish_frame_world(const ros::Publisher &pubLaserCloudFullRes, 
     }
   }
   if (laserCloudWorldRGB->size() > 0)
-    PointCloudXYZI().swap(*pcl_wait_pub);
+  PointCloudXYZI().swap(*pcl_wait_pub);
   PointCloudXYZI().swap(*pcl_w_wait_pub);
 }
 

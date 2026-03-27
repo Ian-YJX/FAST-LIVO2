@@ -10,14 +10,8 @@ common:
   use_external_odom : false
 
 extrin_calib:
-  #simu_Red
-  # extrinsic_T: [0.000, 0.000, 0.390] #ImuToLidar
-  # extrinsic_R: [1, 0, 0, 0, 1, 0, 0, 0, 1]
-  # Rcl: [0, 0, 1, -1, 0, 0, 0, -1, 0] #LidarToCamera
-  # Pcl: [0.000, 0.033,-0.103]
-
-  # simu_Blue
-  extrinsic_T: [0.00000, 0.00000, 0.722]
+  # simu_Red (Rcl uses Blue's value — Red's original Rcl was incorrect)
+  extrinsic_T: [0.000, 0.000, 0.390] #ImuToLidar
   extrinsic_R: [1, 0, 0, 0, 1, 0, 0, 0, 1]
   Rcl: [0, -1, 0, 
         0, 0, -1, 
@@ -38,8 +32,8 @@ preprocess:
 
 vio:
   max_iterations: 5
-  outlier_threshold: 1000 # 78 100 156 #100 200 500 700 infinite
-  img_point_cov: 100 # 100 1000 
+  outlier_threshold: 1000
+  img_point_cov: 100
   patch_size: 8
   patch_pyrimid_level: 4
   normal_en: true
@@ -51,16 +45,16 @@ vio:
 imu:
   imu_en: true
   imu_int_frame: 30
-  acc_cov: 0.5 # 0.2
-  gyr_cov: 0.3 # 0.5
-  b_acc_cov: 0.0001 # 0.1
-  b_gyr_cov: 0.0001 # 0.1
+  acc_cov: 0.5
+  gyr_cov: 0.3
+  b_acc_cov: 0.0001
+  b_gyr_cov: 0.0001
 
 lio:
   max_iterations: 5
   dept_err: 0.02
   beam_err: 0.05
-  min_eigen_value: 0.0025 # 0.005
+  min_eigen_value: 0.0025
   voxel_size: 0.5
   max_layer: 2
   max_points_num: 50
@@ -83,13 +77,11 @@ publish:
   blind_rgb_points: 0.0
 
 evo:
-  seq_name: "CBD_Building_01"
+  seq_name: "simu_red"
   pose_output_en: false
 
 pcd_save:
   pcd_save_en: false
-  colmap_output_en: false # need to set interval = -1
+  colmap_output_en: false
   filter_size_pcd: 0.15
   interval: -1
-  # how many LiDAR frames saved in each pcd file;
-  # -1 : all frames will be saved in ONE pcd file, may lead to memory crash when having too much frames.

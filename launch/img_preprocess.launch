@@ -1,5 +1,5 @@
 <launch>
-  <arg name="semantic" default="false" />
+  <arg name="semantic" default="true" />
   <arg name="resize_width"  default="800" />
   <arg name="resize_height" default="450" />
 
