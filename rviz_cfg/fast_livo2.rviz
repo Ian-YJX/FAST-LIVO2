@@ -6,7 +6,6 @@ Panels:
       Expanded:
         - /Status1
         - /mapping1
-        - /mapping1/currPoints1
         - /mapping1/surround1
         - /mapping1/surround1/Autocompute Value Bounds1
         - /mapping1/PointCloud21
@@ -97,7 +96,7 @@ Visualization Manager:
           Use Fixed Frame: true
           Use rainbow: false
           Value: false
-        - Alpha: 1
+        - Alpha: 0.03999999910593033
           Autocompute Intensity Bounds: false
           Autocompute Value Bounds:
             Max Value: 15
@@ -119,8 +118,8 @@ Visualization Manager:
           Position Transformer: XYZ
           Queue Size: 1
           Selectable: false
-          Size (Pixels): 2
-          Size (m): 0.05000000074505806
+          Size (Pixels): 1
+          Size (m): 0.019999999552965164
           Style: Points
           Topic: /cloud_registered
           Unreliable: true
@@ -205,7 +204,7 @@ Visualization Manager:
       Head Length: 0
       Length: 0.30000001192092896
       Line Style: Billboards
-      Line Width: 0.03999999910593033
+      Line Width: 0.10000000149011612
       Name: Path
       Offset:
         X: 0
@@ -284,7 +283,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/ThirdPersonFollower
-      Distance: 65.51353454589844
+      Distance: 111.74966430664062
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -292,17 +291,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 43.273170471191406
-        Y: 1.645627737045288
-        Z: 4.49199287686497e-05
+        X: 17.287250518798828
+        Y: 10.32537841796875
+        Z: 2.8529819246614352e-05
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.5497957468032837
+      Pitch: 1.5697963237762451
       Target Frame: drone
-      Yaw: 3.2880966663360596
+      Yaw: 3.259922504425049
     Saved:
       - Class: rviz/Orbit
         Distance: 117.53474426269531

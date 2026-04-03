@@ -1,0 +1,43 @@
+<launch>
+<!-- Phase D: Multi-session Mesh
+     FAST-LIVO2 (red) + STD multi-session + ImMesh
+     ImMesh 先加载蓝车 PCD (blue_merged_W1.pcd) 建底图 Mesh，
+     再通过 mesh_topic 接收红车在线注册点云增量构建 Mesh -->
+
+  <param name="use_sim_time" value="true" />
+  <arg name="rviz" default="true" />
+
+  <!-- ========== FAST-LIVO2 ========== -->
+  <rosparam command="load" file="$(find fast_livo)/config/simu_red.yaml" />
+
+  <!-- Image preprocessing + semantic inference -->
+  <include file="$(find fast_livo)/launch/img_preprocess.launch"/>
+
+  <!-- FAST-LIVO2 mapping -->
+  <node pkg="fast_livo" type="fastlivo_mapping" name="laserMapping" output="log">
+    <rosparam file="$(find fast_livo)/config/camera_realsense.yaml" />
+  </node>
+
+  <!-- ========== STD Multi-Session ========== -->
+  <rosparam command="load" file="$(find std_detector)/config/config_simu_multi_session.yaml" />
+
+  <node pkg="std_detector" type="online_multi_session_demo"
+        name="online_multi_session_demo" output="screen"/>
+
+  <!-- ========== ImMesh (预加载蓝车 PCD + 在线红车 Mesh) ========== -->
+  <!-- multi-session 配置: extrinsic_T 保持正确值，mesh_body 路径已在代码中跳过 extrinsic -->
+  <rosparam command="load" file="$(find ImMesh)/config/simu_mesh_multi_session.yaml" />
+  <param name="pc_name" type="string"
+         value="/root/catkin_ws/src/STD/data_simu/blue/blue_merged_W1.pcd" />
+  <param name="meshing/distance_scale" type="double" value="1.0" />
+  <param name="gui_font_size" type="int" value="20" />
+
+  <node pkg="ImMesh" type="ImMesh_mapping" name="ImMesh_mapping" output="screen" />
+
+  <!-- RViz (optional) -->
+  <group if="$(arg rviz)">
+    <node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz"
+          args="-d $(find std_detector)/rviz_cfg/online_ms.rviz" />
+  </group>
+
+</launch>

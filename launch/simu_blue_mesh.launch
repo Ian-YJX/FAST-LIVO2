@@ -1,0 +1,31 @@
+<launch>
+<!-- Simu Blue + ImMesh: FAST-LIVO2 单session 在线 Mesh 重建 -->
+<!-- 参考 fast_livo2_and_mesh.launch: ImMesh 运行自身 LIO + mesh_topic 接收注册点云 -->
+
+  <arg name="rviz" default="false" />
+
+  <!-- ========== FAST-LIVO2 ========== -->
+  <rosparam command="load" file="$(find fast_livo)/config/simu_blue.yaml" />
+
+  <!-- Image preprocessing + semantic inference -->
+  <include file="$(find fast_livo)/launch/img_preprocess.launch"/>
+
+  <!-- FAST-LIVO2 mapping -->
+  <node pkg="fast_livo" type="fastlivo_mapping" name="laserMapping" output="log">
+    <rosparam file="$(find fast_livo)/config/camera_realsense.yaml" />
+  </node>
+
+  <!-- ========== ImMesh (自身 LIO + mesh_topic 做 Mesh 重建) ========== -->
+  <rosparam command="load" file="$(find ImMesh)/config/simu_mesh_online.yaml" />
+  <param name="meshing/distance_scale" type="double" value="1.0" />
+  <param name="gui_font_size" type="int" value="20" />
+
+  <node pkg="ImMesh" type="ImMesh_mapping" name="ImMesh_mapping" output="screen" />
+
+  <!-- RViz (optional) -->
+  <group if="$(arg rviz)">
+    <node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz"
+          args="-d $(find fast_livo)/rviz_cfg/fast_livo2.rviz" />
+  </group>
+
+</launch>

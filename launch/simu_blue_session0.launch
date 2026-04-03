@@ -13,7 +13,7 @@
   <include file="$(find fast_livo)/launch/img_preprocess.launch"/>
 
   <!-- FAST-LIVO2 mapping -->
-  <node pkg="fast_livo" type="fastlivo_mapping" name="laserMapping" output="screen">
+  <node pkg="fast_livo" type="fastlivo_mapping" name="laserMapping" output="log">
     <rosparam file="$(find fast_livo)/config/camera_realsense.yaml" />
   </node>
 
