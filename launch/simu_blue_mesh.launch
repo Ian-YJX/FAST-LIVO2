@@ -2,7 +2,7 @@
 <!-- Simu Blue + ImMesh: FAST-LIVO2 单session 在线 Mesh 重建 -->
 <!-- 参考 fast_livo2_and_mesh.launch: ImMesh 运行自身 LIO + mesh_topic 接收注册点云 -->
 
-  <arg name="rviz" default="false" />
+  <arg name="rviz" default="true" />
 
   <!-- ========== FAST-LIVO2 ========== -->
   <rosparam command="load" file="$(find fast_livo)/config/simu_blue.yaml" />
@@ -16,11 +16,14 @@
   </node>
 
   <!-- ========== ImMesh (自身 LIO + mesh_topic 做 Mesh 重建) ========== -->
-  <rosparam command="load" file="$(find ImMesh)/config/simu_mesh_online.yaml" />
+  <!-- <rosparam command="load" file="$(find ImMesh)/config/simu_mesh_online.yaml" />
   <param name="meshing/distance_scale" type="double" value="1.0" />
   <param name="gui_font_size" type="int" value="20" />
 
-  <node pkg="ImMesh" type="ImMesh_mapping" name="ImMesh_mapping" output="screen" />
+  <node pkg="ImMesh" type="ImMesh_mapping" name="ImMesh_mapping" output="screen" /> -->
+
+  <rosparam command="load" file="$(find std_detector)/config/config_simu_blue.yaml" />
+  <node pkg="std_detector" type="online_demo"	name="online_demo" output="screen"/>
 
   <!-- RViz (optional) -->
   <group if="$(arg rviz)">

@@ -28,7 +28,7 @@
   <!-- multi-session 配置: extrinsic_T 保持正确值，mesh_body 路径已在代码中跳过 extrinsic -->
   <rosparam command="load" file="$(find ImMesh)/config/simu_mesh_multi_session.yaml" />
   <param name="pc_name" type="string"
-         value="/root/catkin_ws/src/STD/data_simu/blue/blue_merged_W1.pcd" />
+         value="/root/catkin_ws/src/STD/data_simu/blue/pcd/" />
   <param name="meshing/distance_scale" type="double" value="1.0" />
   <param name="gui_font_size" type="int" value="20" />
 
