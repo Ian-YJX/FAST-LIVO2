@@ -1,0 +1,41 @@
+<launch>
+<!-- Phase D: GEODE stairs_gamma (Livox AVIA) multi-session + ImMesh
+     FAST-LIVO2 + STD multi-session + ImMesh (preload alpha PCD + online gamma Mesh)
+     Prerequisites: Phase A keyframes saved in data_stairs/alpha/
+     Run: rosbag play ~/catkin_ws/bags/GEODE/stairs/stairs_gamma.bag -->
+
+  <arg name="rviz" default="true" />
+
+  <!-- ========== FAST-LIVO2 ========== -->
+  <rosparam command="load" file="$(find fast_livo)/config/stairs_gamma.yaml" />
+
+  <!-- Image preprocessing + semantic inference -->
+  <include file="$(find fast_livo)/launch/img_preprocess_geode_gamma.launch"/>
+
+  <!-- FAST-LIVO2 mapping -->
+  <node pkg="fast_livo" type="fastlivo_mapping" name="laserMapping" output="screen">
+    <rosparam file="$(find fast_livo)/config/camera_geode_gamma.yaml" />
+  </node>
+
+  <!-- ========== STD Multi-Session ========== -->
+  <rosparam command="load" file="$(find std_detector)/config/config_stairs_multi_session.yaml" />
+
+  <node pkg="std_detector" type="online_multi_session_demo"
+        name="online_multi_session_demo" output="screen"/>
+
+  <!-- ========== ImMesh (preload alpha PCD + online gamma Mesh) ========== -->
+  <rosparam command="load" file="$(find ImMesh)/config/stairs_mesh_multi_session.yaml" />
+  <param name="pc_name" type="string"
+         value="/root/catkin_ws/src/STD/data_stairs/alpha/pcd/" />
+  <param name="meshing/distance_scale" type="double" value="1.0" />
+  <param name="gui_font_size" type="int" value="20" />
+
+  <node pkg="ImMesh" type="ImMesh_mapping" name="ImMesh_mapping" output="screen" />
+
+  <!-- RViz -->
+  <group if="$(arg rviz)">
+    <node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz"
+          args="-d $(find std_detector)/rviz_cfg/online_ms.rviz" />
+  </group>
+
+</launch>

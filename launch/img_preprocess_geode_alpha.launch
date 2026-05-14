@@ -1,0 +1,39 @@
+<launch>
+  <!-- GEODE Alpha: 解压左目图像 + 语义推理 -->
+  <arg name="semantic" default="true" />
+  <arg name="resize_width"  default="800" />
+  <arg name="resize_height" default="450" />
+
+  <!-- 1) compressed -> raw
+       输入:  /left_camera/compressed  (bag topic)
+       输出:  /geode/left_camera       (raw Image)
+  -->
+  <node pkg="image_transport" type="republish" name="color_republish"
+        args="compressed in:=/left_camera raw out:=/geode/left_camera"
+        output="screen" respawn="true" />
+
+  <group if="$(arg semantic)">
+    <!-- 2) nodelet manager -->
+    <node pkg="nodelet" type="nodelet" name="image_proc_manager"
+          args="manager"
+          output="screen" />
+
+    <!-- 3) resize for semantic inference -->
+    <node pkg="nodelet" type="nodelet" name="semantic_inference_resize"
+          args="load image_proc/resize image_proc_manager"
+          output="screen" respawn="false">
+
+      <remap from="image" to="/geode/left_camera" />
+      <remap from="camera_info" to="/geode/left_camera/camera_info" />
+      <remap from="~image" to="/semantic_inference/color/image_raw" />
+      <remap from="~camera_info" to="/semantic_inference/color/camera_info" />
+
+      <param name="use_scale" value="false" />
+      <param name="width"  value="$(arg resize_width)" />
+      <param name="height" value="$(arg resize_height)" />
+    </node>
+
+    <include file="$(find semantic_inference_ros)/launch/semantic_inference.launch"/>
+  </group>
+
+</launch>

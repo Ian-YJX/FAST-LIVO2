@@ -1,0 +1,15 @@
+# GEODE Alpha: Left HikRobot MV-CS050-10GC
+# Distortion: OpenCV [k1, k2, p1, p2, k3]
+cam_model: Pinhole
+cam_width: 1224
+cam_height: 1024
+scale: 1.0
+cam_fx: 1178.885034
+cam_fy: 1179.140806
+cam_cx: 606.644753
+cam_cy: 520.465787
+cam_d0: -0.054564387916302
+cam_d1:  0.118401668712345
+cam_d2: -5.660201404086453e-05
+cam_d3:  1.663858521146268e-04
+cam_d4: -0.034762741185600

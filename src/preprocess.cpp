@@ -88,7 +88,9 @@ void Preprocess::process(const sensor_msgs::PointCloud2::ConstPtr &msg, PointClo
   case OUST64SIMU:
     oust64_simu_handler(msg);
     break;
-
+  case OUSTGARDEN:
+    oust_garden_handler(msg);
+    break;
   default:
     printf("Error LiDAR Type: %d \n", lidar_type);
     break;
@@ -442,6 +444,143 @@ void Preprocess::oust64_simu_handler(const sensor_msgs::PointCloud2::ConstPtr &m
       return a.curvature < b.curvature;
     });
   }
+  // pub_func(pl_surf, pub_full, msg->header.stamp);
+  // pub_func(pl_surf, pub_corn, msg->header.stamp);
+}
+
+void Preprocess::oust_garden_handler(const sensor_msgs::PointCloud2::ConstPtr &msg)
+{
+  pl_surf.clear();
+  pl_corn.clear();
+  pl_full.clear();
+
+  pcl::PointCloud<ouster_garden::Point> pl_orig;
+  pcl::fromROSMsg(*msg, pl_orig);
+
+  int plsize = pl_orig.size();
+
+  pl_corn.reserve(plsize);
+  pl_surf.reserve(plsize);
+
+  // garden 数据中的 timestamp 是绝对时间戳，单位 ns
+  // FAST-LIVO 后续去畸变需要的是当前 scan 内部的相对时间，单位 ms
+  const double frame_start_ns = static_cast<double>(msg->header.stamp.toNSec());
+
+  if (feature_enabled)
+  {
+    for (int i = 0; i < N_SCANS; i++)
+    {
+      pl_buff[i].clear();
+      pl_buff[i].reserve(plsize);
+    }
+
+    for (uint i = 0; i < plsize; i++)
+    {
+      double range =
+          pl_orig.points[i].x * pl_orig.points[i].x +
+          pl_orig.points[i].y * pl_orig.points[i].y +
+          pl_orig.points[i].z * pl_orig.points[i].z;
+
+      if (range < blind_sqr) continue;
+
+      double offset_ms = (pl_orig.points[i].timestamp - frame_start_ns) / 1e6;
+
+      // 正常一帧 Ouster/Livox-like scan 通常约 100 ms；
+      // 这里保留一定冗余，过滤明显错误的点内时间。
+      if (offset_ms < -5.0 || offset_ms > 200.0)
+      {
+        continue;
+      }
+
+      PointType added_pt;
+      added_pt.x = pl_orig.points[i].x;
+      added_pt.y = pl_orig.points[i].y;
+      added_pt.z = pl_orig.points[i].z;
+      added_pt.intensity = pl_orig.points[i].intensity;
+      added_pt.normal_x = 0;
+      added_pt.normal_y = 0;
+      added_pt.normal_z = 0;
+
+      added_pt.curvature = offset_ms;
+
+      if (pl_orig.points[i].line < N_SCANS)
+      {
+        pl_buff[pl_orig.points[i].line].push_back(added_pt);
+      }
+    }
+
+    for (int j = 0; j < N_SCANS; j++)
+    {
+      PointCloudXYZI &pl = pl_buff[j];
+      int linesize = pl.size();
+
+      if (linesize == 0)
+      {
+        continue;
+      }
+
+      vector<orgtype> &types = typess[j];
+      types.clear();
+      types.resize(linesize);
+
+      for (int i = 0; i < linesize - 1; i++)
+      {
+        types[i].range = sqrt(pl[i].x * pl[i].x + pl[i].y * pl[i].y);
+
+        vx = pl[i].x - pl[i + 1].x;
+        vy = pl[i].y - pl[i + 1].y;
+        vz = pl[i].z - pl[i + 1].z;
+
+        types[i].dista = vx * vx + vy * vy + vz * vz;
+      }
+
+      types[linesize - 1].range =
+          sqrt(pl[linesize - 1].x * pl[linesize - 1].x +
+               pl[linesize - 1].y * pl[linesize - 1].y);
+
+      give_feature(pl, types);
+    }
+  }
+  else
+  {
+    for (int i = 0; i < pl_orig.points.size(); i++)
+    {
+      if (i % point_filter_num != 0) continue;
+
+      double range =
+          pl_orig.points[i].x * pl_orig.points[i].x +
+          pl_orig.points[i].y * pl_orig.points[i].y +
+          pl_orig.points[i].z * pl_orig.points[i].z;
+
+      if (range < blind_sqr) continue;
+
+      double offset_ms = (pl_orig.points[i].timestamp - frame_start_ns) / 1e6;
+
+      if (offset_ms < -5.0 || offset_ms > 200.0)
+      {
+        continue;
+      }
+
+      PointType added_pt;
+      added_pt.x = pl_orig.points[i].x;
+      added_pt.y = pl_orig.points[i].y;
+      added_pt.z = pl_orig.points[i].z;
+      added_pt.intensity = pl_orig.points[i].intensity;
+      added_pt.normal_x = 0;
+      added_pt.normal_y = 0;
+      added_pt.normal_z = 0;
+
+      added_pt.curvature = offset_ms;
+
+      pl_surf.points.push_back(added_pt);
+    }
+
+    std::sort(pl_surf.points.begin(), pl_surf.points.end(),
+              [](const PointType &a, const PointType &b) {
+                return a.curvature < b.curvature;
+              });
+  }
+
   // pub_func(pl_surf, pub_full, msg->header.stamp);
   // pub_func(pl_surf, pub_corn, msg->header.stamp);
 }

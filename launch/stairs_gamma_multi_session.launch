@@ -1,0 +1,33 @@
+<launch>
+<!-- Phase C: GEODE stairs_gamma (Livox AVIA) multi-session
+     FAST-LIVO2 + STD multi-session matching against alpha keyframes
+     Prerequisites: Phase A keyframes saved in data_stairs/alpha/
+     Run: rosbag play ~/catkin_ws/bags/GEODE/stairs/stairs_gamma.bag -->
+
+  <arg name="rviz" default="true" />
+
+  <!-- ========== FAST-LIVO2 ========== -->
+  <rosparam command="load" file="$(find fast_livo)/config/stairs_gamma.yaml" />
+
+  <!-- STD multi-session -->
+  <rosparam command="load" file="$(find std_detector)/config/config_stairs_multi_session.yaml" />
+
+  <!-- Image preprocessing + semantic inference -->
+  <include file="$(find fast_livo)/launch/img_preprocess_geode_gamma.launch"/>
+
+  <!-- FAST-LIVO2 mapping -->
+  <node pkg="fast_livo" type="fastlivo_mapping" name="laserMapping" output="screen">
+    <rosparam file="$(find fast_livo)/config/camera_geode_gamma.yaml" />
+  </node>
+
+  <!-- STD online multi-session demo (load alpha session0 + online gamma session1) -->
+  <node pkg="std_detector" type="online_multi_session_demo"
+        name="online_multi_session_demo" output="screen"/>
+
+  <!-- RViz -->
+  <group if="$(arg rviz)">
+    <node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz"
+          args="-d $(find std_detector)/rviz_cfg/online_ms.rviz" />
+  </group>
+
+</launch>

@@ -47,7 +47,8 @@ enum LID_TYPE
   XT32 = 5,
   PANDAR128 = 6,
   ROBOSENSE = 7,
-  OUST64SIMU = 8
+  OUST64SIMU = 8,
+  OUSTGARDEN = 9 
 };
 enum SLAM_MODE
 {

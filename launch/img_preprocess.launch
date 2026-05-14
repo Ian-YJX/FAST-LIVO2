@@ -1,5 +1,5 @@
 <launch>
-  <arg name="semantic" default="true" />
+  <arg name="semantic" default="false" />
   <arg name="resize_width"  default="800" />
   <arg name="resize_height" default="450" />
 
@@ -8,7 +8,7 @@
        输出:  /camera/color/image_raw
   -->
   <node pkg="image_transport" type="republish" name="color_republish"
-        args="compressed in:=/realsense/color/image_raw raw out:=/realsense/color/image_raw"
+        args="compressed in:=/camera/color/image_raw raw out:=/camera/color/image_raw"
         output="screen" respawn="true" />
 
       <group if="$(arg semantic)">

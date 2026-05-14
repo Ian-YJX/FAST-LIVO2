@@ -6,12 +6,11 @@ Panels:
       Expanded:
         - /Status1
         - /mapping1
-        - /mapping1/surround1
         - /mapping1/surround1/Autocompute Value Bounds1
-        - /mapping1/PointCloud21
         - /Odometry1/Odometry1
         - /Odometry1/Odometry1/Shape1
         - /MarkerArray1/Namespaces1
+        - /Image1
       Splitter Ratio: 0.3435114622116089
     Tree Height: 364
   - Class: rviz/Selection
@@ -96,7 +95,7 @@ Visualization Manager:
           Use Fixed Frame: true
           Use rainbow: false
           Value: false
-        - Alpha: 0.03999999910593033
+        - Alpha: 1
           Autocompute Intensity Bounds: false
           Autocompute Value Bounds:
             Max Value: 15
@@ -245,7 +244,7 @@ Visualization Manager:
       Value: false
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /semantic_inference/semantic_color/image_raw
+      Image Topic: /camera/color/image_raw
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -283,7 +282,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/ThirdPersonFollower
-      Distance: 111.74966430664062
+      Distance: 10.571935653686523
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -291,17 +290,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 17.287250518798828
-        Y: 10.32537841796875
-        Z: 2.8529819246614352e-05
+        X: -0.42646360397338867
+        Y: -3.7865452766418457
+        Z: 2.9006656404817477e-05
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.5697963237762451
+      Pitch: 0.4297983944416046
       Target Frame: drone
-      Yaw: 3.259922504425049
+      Yaw: 2.939924478530884
     Saved:
       - Class: rviz/Orbit
         Distance: 117.53474426269531

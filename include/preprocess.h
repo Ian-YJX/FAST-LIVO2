@@ -115,6 +115,25 @@ POINT_CLOUD_REGISTER_POINT_STRUCT(ouster_simu::Point, (float, x, x)(float, y, y)
                                   (std::uint16_t, ring, ring)(float, time, time))
 /****************/
 
+/*** Custom Ouster in Yunnan Garden dataset***/
+namespace ouster_garden
+{
+struct EIGEN_ALIGN16 Point
+{
+  PCL_ADD_POINT4D;
+  float intensity;
+  uint8_t tag;
+  uint8_t line;
+  // uint16_t ring;
+  // float time;
+  double timestamp;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+};
+} // namespace ouster_garden
+POINT_CLOUD_REGISTER_POINT_STRUCT(ouster_garden::Point, (float, x, x)(float, y, y)(float, z, z)(float, intensity, intensity)
+                                  (std::uint8_t, tag, tag)(std::uint8_t, line, line)(double, timestamp, timestamp))
+/****************/
+
 /*** Hesai_XT32 ***/
 namespace xt32_ros
 {
@@ -194,6 +213,7 @@ private:
   void robosense_handler(const sensor_msgs::PointCloud2::ConstPtr &msg);
   void l515_handler(const sensor_msgs::PointCloud2::ConstPtr &msg);
   void oust64_simu_handler(const sensor_msgs::PointCloud2::ConstPtr &msg);
+  void oust_garden_handler(const sensor_msgs::PointCloud2::ConstPtr &msg);
   void give_feature(PointCloudXYZI &pl, vector<orgtype> &types);
   void pub_func(PointCloudXYZI &pl, const ros::Time &ct);
   int plane_judge(const PointCloudXYZI &pl, vector<orgtype> &types, uint i, uint &i_nex, Eigen::Vector3d &curr_direct);
